@@ -21,6 +21,7 @@ with urlopen(url) as page:
 heading_overall = "EMS Control MODE"
 heading_status  = "PCS Status"
 heading_pvbat   = "PCS Sensing Data"
+heading_battery = "BMS data"
 
 def find_extract_table(heading, table_type):
    "Finds the table based on the Heading, then Extracts"
@@ -31,6 +32,8 @@ def find_extract_table(heading, table_type):
    tbl = h.parent.parent
    if table_type == "vip":
       return extract_vip(tbl)
+   elif table_type == "bat":
+      return extract_battery_pct(tbl)
    else:
       return extract_paired_columns(tbl)
 
@@ -65,6 +68,12 @@ def extract_vip(table):
          data[label] = vip
    return data
 
+def extract_battery_pct(table):
+   "Extract the battery's current capacity %"
+   soc_td = table.find("td", string="SOC(%):")
+   val_td = soc_td.next_sibling
+   return get_value(val_td)
+
 def get_value(cell):
    "Cell's value, as int or float if possible"
    v = cell.text.strip()
@@ -80,3 +89,4 @@ def get_value(cell):
 print(find_extract_table(heading_overall, "4col"))
 print(find_extract_table(heading_status,  "6col"))
 print(find_extract_table(heading_pvbat,   "vip"))
+print(find_extract_table(heading_battery, "bat"))
