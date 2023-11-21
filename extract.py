@@ -90,3 +90,6 @@ print(find_extract_table(heading_overall, "4col"))
 print(find_extract_table(heading_status,  "6col"))
 print(find_extract_table(heading_pvbat,   "vip"))
 print(find_extract_table(heading_battery, "bat"))
+
+from export import *
+influx_write_vips("10.5.2.1",8086,"power", find_extract_table(heading_pvbat,   "vip"))

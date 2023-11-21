@@ -36,6 +36,17 @@ generation / load / batteries. The pages are:
 
 ![Power information from the ESS pages](images/EMSPowerInfo.png)
 
+## TODOs
+
+ * Refactor
+ * Unit test parsing
+ * Nice command line arguments
+ * Proper export to:
+  * Console for humans
+  * Console JSON
+  * InfluxDB
+  * Promethius
+
 ## Links
 
  * [Hansol's "My ESS" monitoring](https://myess.hansoltechnics.com/user/user/mon/curr/monitoring.do)
