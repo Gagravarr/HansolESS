@@ -19,6 +19,7 @@ with urlopen(url) as page:
    soup = BeautifulSoup(page, parser)
 
 heading_overall = "EMS Control MODE"
+heading_status  = "PCS Status"
 heading_pvbat   = "PCS Sensing Data"
 
 def find_extract_table(heading, table_type):
@@ -42,8 +43,7 @@ def extract_paired_columns(table):
       cells = iter( row.find_all("td") )
       for d, v in zip(cells,cells):
          if d and v and d.text and v.text:
-            # TODO ints and floats
-            data[d.text] = v.text
+            data[d.text] = get_value(v)
    return data
 
 def extract_vip(table):
@@ -65,5 +65,18 @@ def extract_vip(table):
          data[label] = vip
    return data
 
+def get_value(cell):
+   "Cell's value, as int or float if possible"
+   v = cell.text.strip()
+   try:
+      num = float(v)
+      if num.is_integer():
+         return int(num)
+      return num
+   except ValueError:
+      return v
+
+
 print(find_extract_table(heading_overall, "4col"))
+print(find_extract_table(heading_status,  "6col"))
 print(find_extract_table(heading_pvbat,   "vip"))
