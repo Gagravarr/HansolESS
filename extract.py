@@ -21,9 +21,23 @@ with urlopen(url) as page:
 heading_overall = "EMS Control MODE"
 heading_pvbat   = "PCS Sensing Data"
 
-def extract_4col(table):
-   "Get the labels and values for a 4-column table, excluding the header"
+def find_extract_table(heading, table_type):
+   "Finds the table based on the Heading, then Extracts"
+   h = soup.find("td", string=heading)
+   if not h:
+      raise Exception("Could not find table with heading '%s' in %s" % (heading, url))
+
+   tbl = h.parent.parent
+   if table_type == "vip":
+      return extract_vip(tbl)
+   else:
+      return extract_paired_columns(tbl)
+
+def extract_paired_columns(table):
+   "Get the labels and values from a multi-column table"
    data = {}
+
+   # Skip the header row, then odd-column is label, even-column value
    for row in table.find_all("tr")[1:]:
       cells = iter( row.find_all("td") )
       for d, v in zip(cells,cells):
@@ -51,8 +65,5 @@ def extract_vip(table):
          data[label] = vip
    return data
 
-o = soup.find("td", string=heading_overall)
-p = soup.find("td", string=heading_pvbat)
-
-print(extract_4col(o.parent.parent))
-print(extract_vip(p.parent.parent))
+print(find_extract_table(heading_overall, "4col"))
+print(find_extract_table(heading_pvbat,   "vip"))
