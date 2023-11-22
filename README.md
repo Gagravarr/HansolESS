@@ -47,6 +47,12 @@ generation / load / batteries. The pages are:
   * InfluxDB
   * Promethius
 
+## Exporting
+### InfluxDB
+*need to create the DB first*
+`show databases`
+`create database power`
+
 ## Links
 
  * [Hansol's "My ESS" monitoring](https://myess.hansoltechnics.com/user/user/mon/curr/monitoring.do)

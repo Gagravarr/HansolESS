@@ -6,6 +6,7 @@
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from models import *
 
 url = "http://10.5.2.80:21710/F0"
 
@@ -54,17 +55,17 @@ def extract_vip(table):
    data = {}
    for row in table.find_all("tr"):
       label = row.find("td").text
-      vip = {}
+      vip = VIP(label)
 
       cells = iter( row.find_all("td")[1:] )
       for d, v in zip(cells,cells):
          if d.text == "V[V]:":
-            vip["voltage"] = float(v.text.strip())
+            vip.voltage = float(v.text.strip())
          if d.text == "I[A]:":
-            vip["current"] = float(v.text.strip())
+            vip.current = float(v.text.strip())
          if d.text == "P[W]:":
-            vip["power"] = float(v.text.strip())
-      if len(vip) == 3:
+            vip.power = float(v.text.strip())
+      if vip.is_complete():
          data[label] = vip
    return data
 
