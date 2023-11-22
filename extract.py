@@ -94,9 +94,10 @@ def extract_all():
    # TODO
    print(find_extract_table(heading_overall, "4col"))
    print(find_extract_table(heading_status,  "6col"))
-   print(find_extract_table(heading_battery, "bat"))
 
    system.vips = find_extract_table(heading_pvbat, "vip")
+   system.battery = Battery(
+                 find_extract_table(heading_battery, "bat"), False)
    return system
 
 system = extract_all()
