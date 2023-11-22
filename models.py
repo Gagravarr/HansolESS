@@ -20,14 +20,17 @@ class VIP:
 
 class Battery:
    "Battery state"
-   pass
+   def __init__(self, charge_pct, charging):
+      self.charge_pct = charge_pct
+      self.charge_01 = charge_pct / 100.0
+      self.charging = charging
 
 class Power:
    "Power use and sources"
    pass
 
 class System:
-   pass
-   # vips
-   # power
-   # battery
+   def __init__(self, power=None, battery=None, vips=None):
+      self.power = power
+      self.battery = battery
+      self.vips = vips

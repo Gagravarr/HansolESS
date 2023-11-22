@@ -44,7 +44,8 @@ generation / load / batteries. The pages are:
  * Proper export to:
   * Console for humans
   * Console JSON
-  * InfluxDB
+  * MQTT
+  * InfluxDB (full export, nicer code!)
   * Promethius
 
 ## Exporting

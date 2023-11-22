@@ -6,11 +6,13 @@
 
 from urllib.request import urlopen
 
-def influx_write_vips(host,port,db,vips):
+def influx_write(host, port, db, system):
+   influx_write_vips(host, port, db, system.vips)
+def influx_write_vips(host, port, db, vips):
    lines = []
-   for thing, values in vips.items():
-      f = ",".join("%s=%s" % (k,v) for k,v in values.items())
-      lines.append("power,kind=%s %s" % (thing, f))
+   for vip in vips:
+      f = ",".join("%s=%s" % (k,v) for k,v in vip.items())
+      lines.append("power,kind=%s %s" % (vip.component, f))
    data = "\n".join(lines)
    print(data)
 
