@@ -6,9 +6,24 @@
 
 from urllib.request import urlopen
 
-def influx_write(host, port, db, system):
-   influx_write_vips(host, port, db, system.vips)
-def influx_write_vips(host, port, db, vips):
+def console_write(system):
+   # TODO
+   print(system)
+
+def json_write(system):
+   # TODO
+   print(system)
+
+def mqtt_write(host, port, topic, system):
+   # TODO
+   print(system)
+
+def influx_write(url, db, username, password, system):
+   if not url.endswith("/"):
+      url += "/"
+   # TODO Rest
+   influx_write_vips(url, db, system.vips)
+def influx_write_vips(base_url, db, vips):
    lines = []
    for vip in vips:
       f = ",".join("%s=%s" % (k,v) for k,v in vip.items())
@@ -16,7 +31,10 @@ def influx_write_vips(host, port, db, vips):
    data = "\n".join(lines)
    print(data)
 
-   url = "http://%s:%d/write?db=%s" % (host, port, db)
+   # TODO Refactor
+   url = base_url + "write?db=%s" % (db)
    print(url)
    with urlopen(url, data.encode("utf-8")) as f:
       print(f.read())
+
+# TODO prometheus

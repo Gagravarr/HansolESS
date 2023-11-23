@@ -49,10 +49,23 @@ p.add_argument('--influx-pass',metavar='INFLUX_PASS',
 
 # TODO prometheus
 
+
+# Find out what they want us to do
 args = p.parse_args()
-print(args)
 
-# TODO Rest
-
+# Have the data fetched and extracted
 system = extract_remote(args.host, args.port)
-influx_write("10.5.2.1", 8086, "power", system)
+
+# Run the outputs/exports
+for output in args.output:
+   if output == "console":
+      console_write(system)
+   if output == "json":
+      json_write(system)
+   if output == "mqtt":
+      mqtt_write(args.mqtt_host, args.mqtt_port,
+                 args.mqtt_topic, system)
+   if output == "influx":
+      influx_write(args.influx_url, args.influx_db,
+                   args.influx_user, args.influx_pass, system)
+   # TODO prometheus
