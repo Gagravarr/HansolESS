@@ -30,7 +30,7 @@ p.add_argument('-o','--output',metavar='OUTPUT',required=True,
    choices=("console","json","mqtt","influx","prometheus"),
    help='What systems/formats to output to', nargs='+')
 
-p.add_argument('--mqtt-host',metavar='MQTT_HOST',
+p.add_argument('--mqtt-host',metavar='MQTT_HOST',default='localhost',
    help='Hostname / IP Address of the MQTT Server')
 p.add_argument('--mqtt-port',metavar='MQTT_PORT',default=1883,
    help='Port of the MQTT Server')
