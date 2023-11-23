@@ -6,6 +6,19 @@ Engergy Storage System (ESS) All-In-One (AIO) solar inverter + battery.
 It aims to run on Python 3 without needing many additional modules
 to be installed.
 
+## Installation
+
+You will need Python 3. You also need the Beautiful Soup 4 python
+library (eg `python3-bs4`)
+
+For MQTT output, you need the Paho MQTT python library (eg
+`python3-paho-mqtt`).
+
+Console, JSON and InfluxDB output don't require any additional 
+libraries
+
+Prometheus - TBC.
+
 ## Running the script
 
 Assuming your ESS is on `192.168.1.80` (see below for help finding it
