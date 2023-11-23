@@ -60,12 +60,16 @@ system = extract_remote(args.host, args.port)
 for output in args.output:
    if output == "console":
       console_write(system)
-   if output == "json":
+   elif output == "json":
       json_write(system)
-   if output == "mqtt":
+   elif output == "mqtt":
       mqtt_write(args.mqtt_host, args.mqtt_port,
                  args.mqtt_topic, system)
-   if output == "influx":
+   elif output == "influx":
       influx_write(args.influx_url, args.influx_db,
                    args.influx_user, args.influx_pass, system)
-   # TODO prometheus
+   elif output == "prometheus":
+      # TODO prometheus
+      raise Exception("TODO: Prometheus")
+   else:
+      raise Exception("Unsupported output type: %s" % output)

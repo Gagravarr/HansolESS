@@ -45,5 +45,6 @@ class Power:
 @dataclass
 class System:
    power: Power = None
+   power_30s: Power = None
    battery: Battery = None
    vips: list = None

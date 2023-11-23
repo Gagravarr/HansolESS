@@ -2,7 +2,6 @@
 # Licensed under the Apache License, Version 2.0
 #
 # Extracts data from a Hansol Technics AIO ESS
-# TODO work in progress
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
@@ -14,6 +13,8 @@ try:
 except ModuleNotFoundError:
    parser = "html.parser"
 
+
+# The bits of the horrible page we're interested in
 heading_overall = "EMS Control MODE"
 heading_status  = "PCS Status"
 heading_pvbat   = "PCS Sensing Data"
@@ -54,6 +55,7 @@ def extract_paired_columns(table):
             data[d.text] = get_value(v)
    return data
 
+
 def extract_vips(table):
    "Extract the Voltage/Current/Power data"
    vips = []
@@ -75,22 +77,37 @@ def extract_vips(table):
 
 def extract_battery_pct(table):
    "Extract the battery's current capacity %"
+   # TODO Could we use data[BT_SOC] ?
    soc_td = table.find("td", string="SOC(%):")
    val_td = soc_td.next_sibling
    return get_value(val_td)
 
+def populate_power(s, data):
+   s.power_30s = Power()
+   s.power = Power()
+
+   for pwr, sfx in ((s.power,""), (s.power_30s,"(30s)")):
+      k = lambda s: "%s%s" % (s, sfx)
+      pwr.load = data.get(k("LOAD_P"),None)
+      pwr.grid = data.get(k("GRID_P"),None)
+      pwr.inv  = data.get(k("INV_P"),None)
+      pwr.bat  = data.get(k("BT_P"),None)
+      pwr.pv   = data.get(k("PV_P"),None)
+      # TODO What is "PV_P_User" ?
 
 def extract_all(soup):
    system = System()
 
-   # TODO
-   print(extract_paired_columns(find_table(soup, heading_overall)))
-   print(extract_paired_columns(find_table(soup, heading_status)))
+   data = {
+      **extract_paired_columns(find_table(soup, heading_overall)),
+      **extract_paired_columns(find_table(soup, heading_status)) 
+   }
+   populate_power(system, data)
 
    system.vips = extract_vips(find_table(soup, heading_pvbat))
    system.battery = Battery(
            extract_battery_pct(find_table(soup, heading_battery)),
-           False)
+           False) # TODO
 
    return system
 
