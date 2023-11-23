@@ -18,23 +18,24 @@ def mqtt_write(host, port, topic, system):
    # TODO
    print(system)
 
-def influx_write(url, db, username, password, system):
-   if not url.endswith("/"):
-      url += "/"
-   # TODO Rest
-   influx_write_vips(url, db, system.vips)
-def influx_write_vips(base_url, db, vips):
+def influx_write(base_url, db, username, password, system):
+   if not base_url.endswith("/"):
+      base_url += "/"
+   url = base_url + "write?db=%s" % (db)
+
    lines = []
+   _influx_vips(system.vips, lines)
+   # TODO Rest
+
+   data = "\n".join(lines)
+   print(data)
+   with urlopen(url, data.encode("utf-8")) as f:
+      print(f.read())
+      # TODO Check/use/etc
+
+def _influx_vips(vips, lines):
    for vip in vips:
       f = ",".join("%s=%s" % (k,v) for k,v in vip.items())
       lines.append("power,kind=%s %s" % (vip.component, f))
-   data = "\n".join(lines)
-   print(data)
-
-   # TODO Refactor
-   url = base_url + "write?db=%s" % (db)
-   print(url)
-   with urlopen(url, data.encode("utf-8")) as f:
-      print(f.read())
 
 # TODO prometheus
