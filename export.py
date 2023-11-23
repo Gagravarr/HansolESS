@@ -5,6 +5,7 @@
 
 from urllib.request import urlopen
 
+
 def console_write(s):
    for t,p in (("Current",s.power),("30 Second Average",s.power_30s)):
       print("Power - %s" % t)
@@ -29,6 +30,7 @@ def console_write(s):
       print("  * Power   (W)    %s" % v(vip.power))
    print("")
 
+
 def json_write(system):
    import json
    data = {
@@ -39,9 +41,11 @@ def json_write(system):
    }
    print(  json.dumps(data, indent=2) )
 
+
 def mqtt_write(host, port, topic, system):
    # TODO
    print(system)
+
 
 def influx_write(base_url, db, username, password, system):
    if not base_url.endswith("/"):
@@ -49,18 +53,27 @@ def influx_write(base_url, db, username, password, system):
    url = base_url + "write?db=%s" % (db)
 
    lines = []
+   _influx_power(system.power, lines)
    _influx_vips(system.vips, lines)
-   # TODO Rest
+   _influx_bat(system.battery, lines)
 
    data = "\n".join(lines)
    print(data)
    with urlopen(url, data.encode("utf-8")) as f:
-      print(f.read())
-      # TODO Check/use/etc
+      resp = f.read()
+      if resp:
+         print("Unexpected InfluxDB response:")
+         print(resp)
 
+def _influx_power(power, lines):
+   for thing in vars(power):
+      lines.append("power,kind=%s power=%0.1f" % (thing,getattr(power,thing)))
 def _influx_vips(vips, lines):
    for vip in vips:
       f = ",".join("%s=%s" % (k,v) for k,v in vip.items())
-      lines.append("power,kind=%s %s" % (vip.component, f))
+      lines.append("electrical,kind=%s %s" % (vip.component, f))
+def _influx_bat(battery, lines):
+   lines.append("battery,kind=battery charge=%0.1f,charge_pct=%0d" %
+                (battery.charge_01, battery.charge_pct))
 
 # TODO prometheus
