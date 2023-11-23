@@ -43,8 +43,19 @@ def json_write(system):
 
 
 def mqtt_write(host, port, topic, system):
-   # TODO MQTT
-   print(system)
+   import paho.mqtt.client as mqtt
+   import json
+
+   data = json.dumps({
+       "power": vars(system.power), 
+       "battery": vars(system.battery),
+       "electrical": { v.component:vars(v) for v in system.vips }
+   })
+
+   client = mqtt.Client("HansolESS-Monitoring")
+   client.connect(host, port, 5)
+   client.publish(topic, data)
+   client.disconnect()
 
 
 def influx_write(base_url, db, username, password, system):
