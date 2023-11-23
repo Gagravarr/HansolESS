@@ -43,7 +43,7 @@ def json_write(system):
 
 
 def mqtt_write(host, port, topic, system):
-   # TODO
+   # TODO MQTT
    print(system)
 
 
@@ -58,7 +58,6 @@ def influx_write(base_url, db, username, password, system):
    _influx_bat(system.battery, lines)
 
    data = "\n".join(lines)
-   print(data)
    with urlopen(url, data.encode("utf-8")) as f:
       resp = f.read()
       if resp:
