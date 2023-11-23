@@ -3,7 +3,29 @@
 Tool (tools?) to help you extract useful data from a Hansol Technics
 Engergy Storage System (ESS) All-In-One (AIO) solar inverter + battery.
 
-## Before you begin
+It aims to run on Python 3 without needing many additional modules
+to be installed.
+
+## Running the script
+
+Assuming your ESS is on `192.168.1.80` (see below for help finding it
+if not), to get data printed to the console run
+
+```
+python ./command.py --host 192.168.1.80 --output console
+```
+
+To export to a local InfluxDB with no authentication, you'd run
+```
+python ./command.py --host 192.168.1.80 --output influx
+```
+
+The InfluxDB, MQTT and Prometheus options are designed to be silent
+so they can be run from `cron`.
+
+For the full set of options, run `python ./command.py --help`
+
+## Finding your ESS on the network
 
 You need to know the IP Address of your ESS, and if it is using the default
 port (21710) or not. There doesn't seem to be an easy way to see the IP
@@ -39,19 +61,17 @@ generation / load / batteries. The pages are:
 ## TODOs
 
  * Refactor
- * Unit test parsing
- * Nice command line arguments
+ * Unit test parsing/extracting
  * Proper export to:
-  * Console for humans
-  * Console JSON
   * MQTT
-  * InfluxDB (full export, nicer code!)
   * Prometheus
 
 ## Exporting
 ### InfluxDB
 *need to create the DB first*
+
 `show databases`
+
 `create database power`
 
 ## Links
