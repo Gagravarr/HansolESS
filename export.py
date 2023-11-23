@@ -2,13 +2,32 @@
 #
 # Exports data extracted from a Hansol Technics AIO ESS to
 #  various systems
-# TODO Maybe have dedicated classes/clients?
 
 from urllib.request import urlopen
 
-def console_write(system):
-   # TODO
-   print(system)
+def console_write(s):
+   for t,p in (("Current",s.power),("30 Second Average",s.power_30s)):
+      print("Power - %s" % t)
+      for k in vars(p):
+         v = getattr(p,k)
+         dk = k.ljust(10)
+         dv = ("%0.1f"%v).rjust(7) if v else ""
+         print( " - %s %s" % (dk,dv))
+      print("")
+
+   print("Battery")
+   print(" - Charge %%       %2d%%" % (s.battery.charge_pct))
+   print(" - Charging     %s" % (str(s.battery.charging)).rjust(5))
+   print("")
+
+   print("Component Electrical Data")
+   for vip in s.vips:
+      v = lambda f: ("%0.1f" % f).rjust(6)
+      print(" - %s" % vip.component)
+      print("  * Voltage (V)    %s" % v(vip.voltage))
+      print("  * Current (A)    %s" % v(vip.current))
+      print("  * Power   (W)    %s" % v(vip.power))
+   print("")
 
 def json_write(system):
    import json
