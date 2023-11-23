@@ -11,8 +11,14 @@ def console_write(system):
    print(system)
 
 def json_write(system):
-   # TODO
-   print(system)
+   import json
+   data = {
+       "Power": vars(system.power), 
+       "Power_30s_Avg": vars(system.power_30s),
+       "VIPs":  list(vars(v) for v in system.vips),  
+       "Battery": vars(system.battery) 
+   }
+   print(  json.dumps(data, indent=2) )
 
 def mqtt_write(host, port, topic, system):
    # TODO

@@ -57,7 +57,7 @@ def extract_paired_columns(table):
 
 
 def extract_vips(table):
-   "Extract the Voltage/Current/Power data"
+   "Extract Voltage/Current/Power for the different components"
    vips = []
    for row in table.find_all("tr"):
       label = row.find("td").text
@@ -75,12 +75,12 @@ def extract_vips(table):
          vips.append(vip)
    return vips
 
-def extract_battery_pct(table):
-   "Extract the battery's current capacity %"
-   # TODO Could we use data[BT_SOC] ?
-   soc_td = table.find("td", string="SOC(%):")
-   val_td = soc_td.next_sibling
-   return get_value(val_td)
+def extract_battery_pct(data, detail_table):
+   "Extract information on the battery"
+   # TODO Use the detail table to get more info
+   pct = data["BT_SOC"]
+   charging = data["BT_P"] > 0.0
+   return Battery(pct, charging)
 
 def populate_power(s, data):
    s.power_30s = Power()
@@ -95,6 +95,7 @@ def populate_power(s, data):
       pwr.pv   = data.get(k("PV_P"),None)
       # TODO What is "PV_P_User" ?
 
+
 def extract_all(soup):
    system = System()
 
@@ -105,9 +106,8 @@ def extract_all(soup):
    populate_power(system, data)
 
    system.vips = extract_vips(find_table(soup, heading_pvbat))
-   system.battery = Battery(
-           extract_battery_pct(find_table(soup, heading_battery)),
-           False) # TODO
+   system.battery = extract_battery_pct(
+           data, find_table(soup, heading_battery))
 
    return system
 
