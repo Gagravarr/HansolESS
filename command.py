@@ -4,6 +4,8 @@
 # Extracts data from a Hansol Technics AIO ESS
 
 import argparse
+from extract import extract_remote
+from export import *
 
 class ExplicitDefaultsHelpFormatter(argparse.ArgumentDefaultsHelpFormatter):
    def _get_help_string(self, action):
@@ -51,3 +53,6 @@ args = p.parse_args()
 print(args)
 
 # TODO Rest
+
+system = extract_remote(args.host, args.port)
+influx_write("10.5.2.1", 8086, "power", system)

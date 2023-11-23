@@ -8,16 +8,11 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from models import *
 
-url = "http://10.5.2.80:21710/F0"
-
 try:
    import lxml
    parser = "lxml"
 except ModuleNotFoundError:
    parser = "html.parser"
-
-with urlopen(url) as page:
-   soup = BeautifulSoup(page, parser)
 
 heading_overall = "EMS Control MODE"
 heading_status  = "PCS Status"
@@ -25,22 +20,18 @@ heading_pvbat   = "PCS Sensing Data"
 heading_battery = "BMS data"
 
 
-def find_extract_table(heading, table_type):
-   "Finds the table based on the Heading, then Extracts"
+def find_table(soup, heading):
+   "Finds the table based on the Heading"
    h = soup.find("td", string=heading)
    if not h:
       raise Exception("Could not find table with heading '%s' in %s" % (heading, url))
 
    tbl = h.parent.parent
-   if table_type == "vip":
-      return extract_vips(tbl)
-   elif table_type == "bat":
-      return extract_battery_pct(tbl)
-   else:
-      return extract_paired_columns(tbl)
+   if tbl.name != "table":
+      raise Exception("Table with heading '%s' in the wrong format:\n%s" % (heading, tbl))
+   return tbl
 
 def get_value(cell):
-   "Cell's value, as int or float if possible"
    v = cell.text.strip()
    try:
       num = float(v)
@@ -89,19 +80,29 @@ def extract_battery_pct(table):
    return get_value(val_td)
 
 
-def extract_all():
+def extract_all(soup):
    system = System()
-   # TODO
-   print(find_extract_table(heading_overall, "4col"))
-   print(find_extract_table(heading_status,  "6col"))
 
-   system.vips = find_extract_table(heading_pvbat, "vip")
+   # TODO
+   print(extract_paired_columns(find_table(soup, heading_overall)))
+   print(extract_paired_columns(find_table(soup, heading_status)))
+
+   system.vips = extract_vips(find_table(soup, heading_pvbat))
    system.battery = Battery(
-                 find_extract_table(heading_battery, "bat"), False)
+           extract_battery_pct(find_table(soup, heading_battery)),
+           False)
+
    return system
 
-system = extract_all()
 
+def extract_remote(host, port):
+   url = "http://%s:%d/F0" % (host, port)
+   with urlopen(url) as page:
+      soup = BeautifulSoup(page, parser)
 
-from export import *
-influx_write("10.5.2.1", 8086, "power", system)
+   return extract_all(soup)
+
+def extract_local(filename):
+   with open(filename,"r") as page:
+      soup = BeautifulSoup(page, parser)
+   return extract_all(soup)
