@@ -42,19 +42,28 @@ def json_write(system):
    print(  json.dumps(data, indent=2) )
 
 
-def mqtt_write(host, port, topic, system):
+def mqtt_write(host, port, topic_all, topic_power, topic_battery,
+               topic_electrical, system):
    import paho.mqtt.client as mqtt
    import json
 
-   data = json.dumps({
-       "power": vars(system.power), 
-       "battery": vars(system.battery),
-       "electrical": { v.component:vars(v) for v in system.vips }
-   })
+   d_power = vars(system.power)
+   d_battery = vars(system.battery),
+   d_electrical = { v.component:vars(v) for v in system.vips }
+   data = {"power":d_power, "battery":d_battery, "electrical":d_electrical}
 
    client = mqtt.Client("HansolESS-Monitoring")
    client.connect(host, port, 5)
-   client.publish(topic, data)
+
+   if topic_all:
+      client.publish(topic_all, json.dumps(data))
+   if topic_power:
+      client.publish(topic_power, json.dumps(d_power))
+   if topic_battery:
+      client.publish(topic_battery, json.dumps(d_battery))
+   if topic_electrical:
+      client.publish(topic_electrical, json.dumps(d_electrical))
+
    client.disconnect()
 
 

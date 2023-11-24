@@ -34,8 +34,14 @@ p.add_argument('--mqtt-host',metavar='MQTT_HOST',default='localhost',
    help='Hostname / IP Address of the MQTT Server')
 p.add_argument('--mqtt-port',metavar='MQTT_PORT',default=1883,
    help='Port of the MQTT Server')
-p.add_argument('--mqtt-topic',metavar='MQTT_TOPIC',default='power',
-   help='MQTT Topic to publish data to')
+p.add_argument('--mqtt-topic-all',metavar='MQTT_TOPIC_ALL',default='power',
+   help='MQTT Topic to publish all data to, use an empty string to disable')
+p.add_argument('--mqtt-topic-power',metavar='MQTT_TOPIC_POWER',
+   help='MQTT Topic to publish power-related data to')
+p.add_argument('--mqtt-topic-battery',metavar='MQTT_TOPIC_BATTERY',
+   help='MQTT Topic to publish battery-related data to')
+p.add_argument('--mqtt-topic-electrical',metavar='MQTT_TOPIC_ELEC',
+   help='MQTT Topic to publish electrical-related data to')
 
 p.add_argument('--influx-url',metavar='INFLUX_URL',
    default='http://localhost:8086/',
@@ -46,6 +52,16 @@ p.add_argument('--influx-user',metavar='INFLUX_USER',
    help='InfluxDB server username')
 p.add_argument('--influx-pass',metavar='INFLUX_PASS',
    help='InfluxDB server password')
+
+p.add_argument('--prom-pg-url',metavar='PROM_PG_URL',
+   default='http://localhost:9091/',
+   help='URL of the Prometheus Push-Gateway server')
+p.add_argument('--prom-job',metavar='PROM_JOB',default='power',
+   help='Job to write to on the Prometheus Push-Gateway')
+p.add_argument('--prom-user',metavar='PROM_USER',
+   help='Prometheus server username')
+p.add_argument('--prom-pass',metavar='PROM_PASS',
+   help='Prometheus server password')
 
 # TODO prometheus
 
@@ -63,8 +79,9 @@ for output in args.output:
    elif output == "json":
       json_write(system)
    elif output == "mqtt":
-      mqtt_write(args.mqtt_host, args.mqtt_port,
-                 args.mqtt_topic, system)
+      mqtt_write(args.mqtt_host, args.mqtt_port, args.mqtt_topic_all, 
+                 args.mqtt_topic_power, args.mqtt_topic_battery, 
+                 args.mqtt_topic_electrical, system)
    elif output == "influx":
       influx_write(args.influx_url, args.influx_db,
                    args.influx_user, args.influx_pass, system)
