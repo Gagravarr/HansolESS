@@ -95,4 +95,31 @@ def _influx_bat(battery, lines):
    lines.append("battery,kind=battery charge=%0.1f,charge_pct=%0d" %
                 (battery.charge_01, battery.charge_pct))
 
-# TODO prometheus
+
+def prompg_write(base_url, job, username, password, system):
+   from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
+   from prometheus_client.exposition import basic_auth_handler
+
+   def auth_handler(url, method, timeout, headers, data):
+      return basic_auth_handler(url, method, timeout, headers, data, username, password)
+   registry = CollectorRegistry()
+
+   for thing in vars(system.power):
+      g = Gauge("power_%s_watts" % thing, "Power", registry=registry)
+      g.set( getattr(system.power, thing) )
+   for vip in system.vips:
+      component = vip.component.replace('-','_')
+      g = Gauge("electrical_%s_volts"%component, "Voltage", registry=registry)
+      g.set(vip.voltage)
+      g = Gauge("electrical_%s_amps"%component,  "Current", registry=registry)
+      g.set(vip.current)
+      g = Gauge("electrical_%s_watts"%component, "Power", registry=registry)
+      g.set(vip.power)
+
+   g = Gauge('battery_ratio', 'Battery Charge', registry=registry)
+   g.set(system.battery.charge_01)
+
+   g = Gauge('export_last_unixtime', 'Last time an Export ran', registry=registry)
+   g.set_to_current_time()
+
+   push_to_gateway(base_url, job=job, registry=registry, handler=auth_handler)

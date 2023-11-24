@@ -86,7 +86,7 @@ for output in args.output:
       influx_write(args.influx_url, args.influx_db,
                    args.influx_user, args.influx_pass, system)
    elif output == "prometheus":
-      # TODO prometheus
-      raise Exception("TODO: Prometheus")
+      prompg_write(args.prom_pg_url, args.prom_job,
+                   args.prom_user, args.prom_pass, system)
    else:
       raise Exception("Unsupported output type: %s" % output)
