@@ -119,7 +119,4 @@ def prompg_write(base_url, job, username, password, system):
    g = Gauge('battery_ratio', 'Battery Charge', registry=registry)
    g.set(system.battery.charge_01)
 
-   g = Gauge('export_last_unixtime', 'Last time an Export ran', registry=registry)
-   g.set_to_current_time()
-
    push_to_gateway(base_url, job=job, registry=registry, handler=auth_handler)

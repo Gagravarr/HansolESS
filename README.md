@@ -79,12 +79,12 @@ generation / load / batteries. The pages are:
 ## TODOs
 
  * Unit test parsing/extracting
- * Proper export to:
-  * Prometheus
+ * More detail in the README
 
 ## Exporting
 ### MQTT
-*exports everything as a single JSON message to the topic*
+By default, exports everything as a single JSON message to
+the topic:
 
 ```
 {
@@ -129,6 +129,11 @@ generation / load / batteries. The pages are:
 }
 ```
 
+If you want, you can have each section written to their own
+topics, or only certain sections written. Specify an empty *all*
+topic to disable writing the overall one, eg with 
+`--mqtt-topic-all '' --mqtt-topic-power 'power'`
+
 ### InfluxDB
 *need to create the DB first*
 
@@ -142,9 +147,16 @@ option won't work. Instead, the
 [Prometheus Push Gateway](https://github.com/prometheus/pushgateway) is
 needed so that the script can send metrics then exit.
 
-*need the push gateway installing / setting up*
+You need to run the 
+[Prometheus Push Gateway](https://github.com/prometheus/pushgateway),
+then configure a Prometheus instance to scrape the Push Gateway.
 
-*need the client installing*
+If you want to use the cloud-hosted Grafana, it may be easier to write
+to MQTT and then have Telegraf push to the cloud-hosted Prometheus via
+the InfluxDB emulation! Otherwise, you'll need a local Push Gateway,
+a local Prometheus instance, and configure 
+[remote_write](https://grafana.com/docs/grafana-cloud/send-data/metrics/metrics-prometheus/)
+to push the data onto the cloud.
 
 ## Links
 
