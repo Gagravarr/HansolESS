@@ -104,19 +104,20 @@ def prompg_write(base_url, job, username, password, system):
       return basic_auth_handler(url, method, timeout, headers, data, username, password)
    registry = CollectorRegistry()
 
+   gp = Gauge("power_watts", "Power", ["component"], registry=registry)
    for thing in vars(system.power):
-      g = Gauge("power_%s_watts" % thing, "Power", registry=registry)
-      g.set( getattr(system.power, thing) )
+      gp.labels(component=thing).set( getattr(system.power, thing) )
+
+   gev = Gauge("electrical_volts", "Voltage", ["component"], registry=registry)
+   gei = Gauge("electrical_amps",  "Current", ["component"], registry=registry)
+   gep = Gauge("electrical_watts", "Power", ["component"], registry=registry)
    for vip in system.vips:
       component = vip.component.replace('-','_')
-      g = Gauge("electrical_%s_volts"%component, "Voltage", registry=registry)
-      g.set(vip.voltage)
-      g = Gauge("electrical_%s_amps"%component,  "Current", registry=registry)
-      g.set(vip.current)
-      g = Gauge("electrical_%s_watts"%component, "Power", registry=registry)
-      g.set(vip.power)
+      gev.labels(component=component).set(vip.voltage)
+      gei.labels(component=component).set(vip.current)
+      gep.labels(component=component).set(vip.power)
 
-   g = Gauge('battery_ratio', 'Battery Charge', registry=registry)
-   g.set(system.battery.charge_01)
+   gb = Gauge('battery_ratio', 'Battery Charge', registry=registry)
+   gb.set(system.battery.charge_01)
 
    push_to_gateway(base_url, job=job, registry=registry, handler=auth_handler)
