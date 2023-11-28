@@ -58,6 +58,8 @@ p.add_argument('--prom-pg-url',metavar='PROM_PG_URL',
    help='URL of the Prometheus Push-Gateway server')
 p.add_argument('--prom-job',metavar='PROM_JOB',default='power',
    help='Job to write to on the Prometheus Push-Gateway')
+p.add_argument('--prom-prefix',metavar='PROM_PREFIX',default='house',
+   help='Prefix for all the Prometheus metrics')
 p.add_argument('--prom-user',metavar='PROM_USER',
    help='Prometheus server username')
 p.add_argument('--prom-pass',metavar='PROM_PASS',
@@ -86,7 +88,7 @@ for output in args.output:
       influx_write(args.influx_url, args.influx_db,
                    args.influx_user, args.influx_pass, system)
    elif output == "prometheus":
-      prompg_write(args.prom_pg_url, args.prom_job,
+      prompg_write(args.prom_pg_url, args.prom_job, args.prom_prefix,
                    args.prom_user, args.prom_pass, system)
    else:
       raise Exception("Unsupported output type: %s" % output)

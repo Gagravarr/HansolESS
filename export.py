@@ -96,7 +96,7 @@ def _influx_bat(battery, lines):
                 (battery.charge_01, battery.charge_pct))
 
 
-def prompg_write(base_url, job, username, password, system):
+def prompg_write(base_url, job, prefix, username, password, system):
    from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
    from prometheus_client.exposition import basic_auth_handler
 
@@ -104,20 +104,20 @@ def prompg_write(base_url, job, username, password, system):
       return basic_auth_handler(url, method, timeout, headers, data, username, password)
    registry = CollectorRegistry()
 
-   gp = Gauge("power_watts", "Power", ["component"], registry=registry)
+   gp = Gauge("%s_power_watts"%prefix, "Power", ["component"], registry=registry)
    for thing in vars(system.power):
       gp.labels(component=thing).set( getattr(system.power, thing) )
 
-   gev = Gauge("electrical_volts", "Voltage", ["component"], registry=registry)
-   gei = Gauge("electrical_amps",  "Current", ["component"], registry=registry)
-   gep = Gauge("electrical_watts", "Power", ["component"], registry=registry)
+   gev = Gauge("%s_electrical_volts"%prefix, "Voltage", ["component"], registry=registry)
+   gei = Gauge("%s_electrical_amps"%prefix,  "Current", ["component"], registry=registry)
+   gep = Gauge("%s_electrical_watts"%prefix, "Power", ["component"], registry=registry)
    for vip in system.vips:
       component = vip.component.replace('-','_')
       gev.labels(component=component).set(vip.voltage)
       gei.labels(component=component).set(vip.current)
       gep.labels(component=component).set(vip.power)
 
-   gb = Gauge('battery_ratio', 'Battery Charge', registry=registry)
+   gb = Gauge('%s_battery_ratio'%prefix, 'Battery Charge', registry=registry)
    gb.set(system.battery.charge_01)
 
    push_to_gateway(base_url, job=job, registry=registry, handler=auth_handler)
